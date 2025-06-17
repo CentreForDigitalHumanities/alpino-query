@@ -12,7 +12,7 @@ setup(
     long_description_content_type="text/markdown",
     author='Digital Humanities Lab, Utrecht University',
     author_email='digitalhumanities@uu.nl',
-    url='https://github.com/UUDigitalHumanitieslab/alpino-query',
+    url='https://github.com/CentreForDigitalHumanities/alpino-query',
     license='CC BY-NC-SA 4.0',
     packages=['alpino_query'],
     package_data={"alpino_query": ["py.typed"]},

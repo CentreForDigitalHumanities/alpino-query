@@ -18,5 +18,5 @@ authors:
 identifiers:
   - type: doi
     value: 10.5281/zenodo.10418666
-repository-code: 'https://github.com/UUDigitalHumanitieslab/alpino-query'
+repository-code: 'https://github.com/CentreForDigitalHumanities/alpino-query'
 license: Attribution-NonCommercial-ShareAlike 4.0 International

@@ -1,7 +1,7 @@
 # Alpino Query
 [![DOI](https://zenodo.org/badge/421861899.svg)](https://zenodo.org/doi/10.5281/zenodo.10418665)
 [![PyPI version](https://badge.fury.io/py/alpino-query.svg)](https://badge.fury.io/py/alpino-query)
-[![Actions Status](https://github.com/UUDigitalHumanitiesLab/alpino-query/workflows/Python%20package/badge.svg)](https://github.com/UUDigitalHumanitiesLab/alpino-query/actions)
+[![Actions Status](https://github.com/CentreForDigitalHumanities/alpino-query/workflows/Python%20package/badge.svg)](https://github.com/CentreForDigitalHumanities/alpino-query/actions)
 
 ```bash
 pip install alpino-query
@@ -111,7 +111,7 @@ twine upload dist/*
 
 ## Credits
 
-This was original part of the [GrETEL](https://github.com/UUDigitalHumanitieslab/gretel) codebase and is (still) used by its Example Based Search functionality.
+This was original part of the [GrETEL](https://github.com/CentreForDigitalHumanities/gretel) codebase and is (still) used by its Example Based Search functionality.
 
 * [Liesbeth Augustinus](http://www.ccl.kuleuven.be/~liesbeth/) and [Vincent Vandeghinste](http://www.ccl.kuleuven.be/~vincent/ccl): concept and initial implementation
 * [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design
