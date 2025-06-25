@@ -11,15 +11,13 @@ When running locally without installing, instead of `alpino-query` use `python -
 
 ## Parse
 
-Parse a tokenized sentence using the Alpino instance running on [gretel.hum.uu.nl](https://gretel.hum.uu.nl).
+Parse a (tokenized) sentence using the Alpino instance running on [gretel.hum.uu.nl](https://gretel.hum.uu.nl).
 
 For example:
 
 ```bash
-alpino-query parse Dit is een voorbeeldzin .
+alpino-query parse Dit is een voorbeeldzin.
 ```
-
-Note that the period is a separate token.
 
 It also works when the sentence is passed as a single argument.
 
@@ -29,7 +27,7 @@ alpino-query parse "Dit is een voorbeeldzin ."
 
 ## Mark
 
-Mark which part of the treebank should selected for filtering. It has three inputs:
+Mark which part of the treebank should be selected for filtering. It has three inputs:
 
 1. [Lassy/Alpino XML](https://www.let.rug.nl/~vannoord/Lassy/)
 2. the tokens of the sentence
