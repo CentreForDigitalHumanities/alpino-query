@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
+import asyncio
 import os
 import re
-import socket
 from typing import Tuple, Union, cast
 from datetime import date
 from urllib.parse import quote_plus
@@ -63,7 +62,15 @@ class AlpinoServerClient:
             alpino_home = None
         self.version, self.version_date = determine_alpino_version(alpino_home)
 
-    def parse_line(self, line: str, sentence_id: str) ->str:
+    async def communicate(self, line: str, sentence_id: str) ->str:
+        reader, writer = await asyncio.open_connection(self.host, self.port)
+        if self.prefix_id:
+            line = "{0}|{1}".format(sentence_id, line)
+        writer.write((line + "\n\n").encode())
+        await writer.drain()
+        return (await reader.read()).decode()
+
+    def parse_line(self, line: str, sentence_id: str) -> str:
         """Parse a line using the Alpino parser.
 
 
@@ -74,25 +81,10 @@ class AlpinoServerClient:
         Returns:
             {str} -- Lassy XML
         """
-
         # add a whitespace before the closing punctuation when it's missing
         line = closing_punctuation.sub(
             lambda m: m.group(1) + ' ' + m.group(2), line)
-
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((self.host, self.port))
-        if self.prefix_id:
-            line = "{0}|{1}".format(sentence_id, line)
-        s.sendall((line + "\n\n").encode())
-        received = []
-
-        while True:
-            buffer = s.recv(8192)
-            if not buffer:
-                break
-            received.append(str(buffer, encoding='utf8'))
-
-        xml = "".join(received)
+        xml = asyncio.run(self.communicate(line, sentence_id))
 
         if "<alpino_ds" not in xml:
             raise Exception(xml)
@@ -103,6 +95,7 @@ class AlpinoServerClient:
             xml = sentence_tag_matcher.sub(f" sentid=\"{sentence_id}\"", xml)
 
         return xml
+
 
 
 def parse_sentence_legacy(sentence: str) -> str:
