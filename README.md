@@ -83,6 +83,12 @@ query.generate_xpath(False) # True to make order sensitive
 print(query.xpath)
 ```
 
+## Using a local Alpino server
+
+```python
+query = AlpinoQuery(server=('localhost', 7001))
+```
+
 ## Considerations
 
 ### Exclusive
