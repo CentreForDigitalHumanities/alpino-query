@@ -2,7 +2,7 @@
 from typing import List, Optional
 from lxml import etree
 
-from .parser import parse_sentence
+from .parser import parse_sentence, parse_sentence_legacy
 from .marker import main as mark
 from .subtree import generate_subtree
 from .xpath_generator import main as generate_xpath
@@ -10,6 +10,9 @@ from .xpath_generator import main as generate_xpath
 
 class AlpinoQuery:
     subtree: Optional[etree._Element]
+
+    def __init__(self, server=None):
+        self.server = server
 
     @property
     def marked_xml(self) -> str:
@@ -30,7 +33,12 @@ class AlpinoQuery:
         self.subtree = etree.fromstring(bytes(value, encoding='utf-8'))
 
     def parse(self, tokens: List[str]) -> str:
-        parse = parse_sentence(' '.join(tokens))
+        if self.server is None:
+            return self.parse_legacy(tokens)
+        return parse_sentence(' '.join(tokens), server=self.server)
+
+    def parse_legacy(self, tokens: List[str]) -> str:
+        parse = parse_sentence_legacy(' '.join(tokens))
         self.subtree_xml = parse
         return parse
 
