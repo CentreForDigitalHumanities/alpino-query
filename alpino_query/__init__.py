@@ -2,7 +2,7 @@
 from typing import List, Optional
 from lxml import etree
 
-from .parser import parse_sentence, parse_sentence_legacy
+from .parser import parse_sentence, DEFAULT_GRETEL_GET, Protocol
 from .marker import main as mark
 from .subtree import generate_subtree
 from .xpath_generator import main as generate_xpath
@@ -11,8 +11,9 @@ from .xpath_generator import main as generate_xpath
 class AlpinoQuery:
     subtree: Optional[etree._Element]
 
-    def __init__(self, server=None):
-        self.server = server
+    def __init__(self, address=DEFAULT_GRETEL_GET, protocol=Protocol.GET):
+        self.address = address
+        self.protocol = protocol
 
     @property
     def marked_xml(self) -> str:
@@ -20,7 +21,7 @@ class AlpinoQuery:
 
     @marked_xml.setter
     def marked_xml(self, value: str) -> None:
-        self.marked = etree.fromstring(bytes(value, encoding='utf-8'))
+        self.marked = etree.fromstring(bytes(value, encoding="utf-8"))
 
     @property
     def subtree_xml(self):
@@ -30,19 +31,16 @@ class AlpinoQuery:
 
     @subtree_xml.setter
     def subtree_xml(self, value: str) -> None:
-        self.subtree = etree.fromstring(bytes(value, encoding='utf-8'))
+        self.subtree = etree.fromstring(bytes(value, encoding="utf-8"))
 
     def parse(self, tokens: List[str]) -> str:
-        if self.server is None:
-            return self.parse_legacy(tokens)
-        return parse_sentence(' '.join(tokens), server=self.server)
-
-    def parse_legacy(self, tokens: List[str]) -> str:
-        parse = parse_sentence_legacy(' '.join(tokens))
+        parse = parse_sentence(" ".join(tokens), self.address, self.protocol)
         self.subtree_xml = parse
         return parse
 
-    def mark(self, inputxml: str, tokens: List[str], attributes: List[str]) -> etree._Element:
+    def mark(
+        self, inputxml: str, tokens: List[str], attributes: List[str]
+    ) -> etree._Element:
         self.marked = mark(inputxml, tokens, attributes)
         return self.marked
 
