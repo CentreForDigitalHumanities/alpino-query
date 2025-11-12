@@ -83,6 +83,16 @@ query.generate_xpath(False) # True to make order sensitive
 print(query.xpath)
 ```
 
+## Using a different Alpino server
+
+```python
+from alpino_query import Protocol
+# local Alpino server
+query = AlpinoQuery('localhost:7001', Protocol.NATIVE)
+# different Alpino server and protocol
+query = AlpinoQuery('https://gretel.hum.uu.nl/parse/parse-sentence/#sentence#parsed_sentence', Protocol.POST_JSON)
+```
+
 ## Considerations
 
 ### Exclusive

@@ -29,32 +29,32 @@ from lxml import etree
 def generate_xpath(twig: etree._Element, order: bool) -> str:
     root = twig
 
-    if root.xpath('/alpino_ds'):
+    if root.xpath("/alpino_ds"):
         # for ALPINO XML, leave out the alpino_ds node
-        subtree = cast(etree._Element, root.find('node'))
+        subtree = cast(etree._Element, root.find("node"))
     else:
-        subtree = root    # start at root node
+        subtree = root  # start at root node
 
     # generate XPath expression
 
     topxpath, negate = GetXPath(subtree)
     xpath = ProcessTree(subtree, order)
 
-    if xpath and topxpath:    # if more than one node is selected
+    if xpath and topxpath:  # if more than one node is selected
         if negate:
             xpath = f'//node[@rel="top" and not(..//{topxpath} and ..//{xpath}])]'
         else:
-            xpath = f'//{topxpath} and {xpath}]'
+            xpath = f"//{topxpath} and {xpath}]"
 
     elif xpath and not topxpath:
-        xpath = f'//*[{xpath}]'
+        xpath = f"//*[{xpath}]"
 
     elif not xpath and topxpath:
         # if only one node is selected
         if negate:
             xpath = f'//node[@rel="top" and not(..//{topxpath}])]'
         else:
-            xpath = f'//{topxpath}]'
+            xpath = f"//{topxpath}]"
 
     else:
         print("ERROR: no XPath expression could be generated.\n")
@@ -63,7 +63,7 @@ def generate_xpath(twig: etree._Element, order: bool) -> str:
 
 
 def ProcessTree(tree, order):
-    xpath = ''
+    xpath = ""
     children = tree.getchildren()
     childxpaths = []
     COUNTS = {}
@@ -75,10 +75,10 @@ def ProcessTree(tree, order):
             if childxpath:
                 lower = ProcessTree(child, order)
                 if lower:
-                    childxpath += f' and {lower}]'
+                    childxpath += f" and {lower}]"
 
                 else:
-                    childxpath += ']'
+                    childxpath += "]"
 
                 if negate:
                     childxpath = f"not({childxpath})"
@@ -87,18 +87,20 @@ def ProcessTree(tree, order):
 
         if childxpaths:
             i = 0
-            while (i < len(childxpaths)):
+            while i < len(childxpaths):
 
                 # ADD COUNT FUNCTION
                 if COUNTS[childxpaths[i]] > 1:
-                    childxpaths[i] = \
-                        'count(' \
-                        + childxpaths[i] + ') > ' \
+                    childxpaths[i] = (
+                        "count("
+                        + childxpaths[i]
+                        + ") > "
                         + str(COUNTS[childxpaths[i]] - 1)
+                    )
 
                 # REMOVE DOUBLE DAUGHTERS
                 if childxpaths[i] in ALREADY:
-                    childxpaths = childxpaths[:i] + childxpaths[i+1:]
+                    childxpaths = childxpaths[:i] + childxpaths[i + 1:]
                     i -= 1
 
                 else:
@@ -106,18 +108,20 @@ def ProcessTree(tree, order):
 
                 i += 1
 
-            xpath = str.join(' and ', childxpaths)
+            xpath = str.join(" and ", childxpaths)
 
         else:
             # die "not implemented yet\n";
             return None
 
-    else:    # no children
+    else:  # no children
         if order:
-            xpath = 'number(@begin)'
+            xpath = "number(@begin)"
             next_term, nextpath = FindNextTerminalToCompare(tree)
             if next_term is not None:
-                if float(tree.attrib.get('begin', 'nan')) < float(next_term.attrib.get('begin', 'nan')):
+                if float(tree.attrib.get("begin", "nan")) < float(
+                    next_term.attrib.get("begin", "nan")
+                ):
 
                     xpath += " < "
 
@@ -138,10 +142,10 @@ def FindNextTerminalToCompare(tree):
         path = "../"
         next_terminal, xpath = FindNextLeafNode(next_sibling)
         path = path + xpath
-        if 'begin' in path:
+        if "begin" in path:
 
             # $path='number('.$path.')';
-            path = re.sub(r'\@begin', 'number(@begin)', path)
+            path = re.sub(r"\@begin", "number(@begin)", path)
 
     else:
         # go up the tree to find next sibling
@@ -172,7 +176,7 @@ def FindNextLeafNode(node):
         return node, xpath
 
     else:
-        path = xpath + '/@begin'
+        path = xpath + "/@begin"
         return node, path
 
 
@@ -187,7 +191,7 @@ def escape_xpath_attribute(value: Union[str, int]) -> str:
     """
     if type(value) is int:
         return str(value)
-    
+
     escaped = []
     for part in re.findall('("|\'|[^"]+)', cast(str, value)):
         if '"' in part:
@@ -197,7 +201,7 @@ def escape_xpath_attribute(value: Union[str, int]) -> str:
 
     if len(escaped) == 1:
         return escaped[0]
-    
+
     return "concat(" + ", ".join(escaped) + ")"
 
 
@@ -205,7 +209,9 @@ def property_selector(key: str, value: str, lower: bool, negative: bool) -> str:
     operator = "!=" if negative else "="
 
     if lower and value.lower() != value.upper():
-        selector = f"lower-case(@{key}){operator}{escape_xpath_attribute(value.lower())}"
+        selector = (
+            f"lower-case(@{key}){operator}{escape_xpath_attribute(value.lower())}"
+        )
     elif value:
         selector = f"@{key}{operator}{escape_xpath_attribute(value)}"
     else:
@@ -228,7 +234,7 @@ def GetXPath(tree: etree._Element) -> Tuple[str, bool]:
         str, bool: query, negate
     """
     att = tree.attrib
-    exclude = cast(str, att.get('exclude', '')).split(',')
+    exclude = cast(str, att.get("exclude", "")).split(",")
 
     selectors: List[str] = []
     # if all selectors are exclusive, use the positive selectors
@@ -238,25 +244,24 @@ def GetXPath(tree: etree._Element) -> Tuple[str, bool]:
     for key, value in cast(Iterable[Tuple[str, str]], att.items()):
         # all attributes are included in the XPath expression...
         # ...except these ones
-        if key not in ['postag', 'begin', 'end', 'caseinsensitive', 'exclude']:
+        if key not in ["postag", "begin", "end", "caseinsensitive", "exclude"]:
             lower = False
 
-            if value and key in ['word', 'lemma']:
-                caseinsensitive = cast(str, att.get('caseinsensitive', 'no'))
-                if caseinsensitive == 'yes':
+            if value and key in ["word", "lemma"]:
+                caseinsensitive = cast(str, att.get("caseinsensitive", "no"))
+                if caseinsensitive == "yes":
                     lower = True
 
             if key in exclude:
                 selectors.append(property_selector(key, value, lower, True))
-                positive_selectors.append(
-                    property_selector(key, value, lower, False))
+                positive_selectors.append(property_selector(key, value, lower, False))
             else:
                 selectors.append(property_selector(key, value, lower, False))
 
     if not selectors:
 
         # no matching attributes found
-        return '', False
+        return "", False
 
     else:
         # one or more attributes found
@@ -272,8 +277,8 @@ def GetXPath(tree: etree._Element) -> Tuple[str, bool]:
 
 
 def main(inputxml, order):
-    twig = etree.fromstring(bytes(inputxml, encoding='utf-8'))
-    if order in ['false', 'False', '0', 0, False]:
+    twig = etree.fromstring(bytes(inputxml, encoding="utf-8"))
+    if order in ["false", "False", "0", 0, False]:
         order = False
     else:
         order = True
